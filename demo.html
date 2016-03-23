@@ -1,0 +1,41 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>牌照处理样例</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+	
+	<script type="text/javascript" src="js/easeljs-0.8.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+
+	<script type="text/javascript" src="js/draw.js"></script>
+	<script type="text/javascript" src="js/operation.js"></script>
+
+</head>
+
+<body onload="init();">
+	<h1> 画布 </h1>
+
+	<!-- content goes here -->
+	<div id="main">
+		<canvas id="demoCanvas" width="500" height="500">
+    	</canvas>
+	</div>
+	<div class="op">
+		<a id="magnify" class="btn btn-primary">放大</a>
+		<a id="minify" class="btn btn-primary">缩小</a>
+		<a id="cwr" class="btn btn-primary">顺时针旋转</a>
+		<a id="ccwr" class="btn btn-primary">逆时针旋转</a>
+		<a id="skewL" class="btn btn-primary">向左倾斜</a>
+		<a id="skewR" class="btn btn-primary">向右倾斜</a>
+		<a id="cut-start" class="btn btn-primary">裁剪图片</a>
+		<a id="cut-confirm" class="btn btn-primary">确定</a>
+		<a id="cut-cancel" class="btn btn-primary">取消</a>
+		<a id="cut-repeal" class="btn btn-primary">撤销裁剪</a>
+		<a id="output" class="btn btn-warning">显示结果</a><br>
+		<img alt="图片处理结果" />
+        <p></p>
+	</div>
+</body>
+</html>
