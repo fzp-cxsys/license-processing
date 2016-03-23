@@ -1,4 +1,8 @@
-﻿var canvasID = "demoCanvas";
+﻿//canvas元素的id
+var canvasID = "demoCanvas";
+/**
+ * 整个脚本的初始化操作
+ */
 function init() {
 	var stage = new createjs.Stage(canvasID);
 			
@@ -7,17 +11,89 @@ function init() {
 	stage.mouseMoveOutside = true;
     stage.enableMouseOver(10);
 
-    addCarImg(stage, "img/img200706080802251506.jpg");
+    var img = addCarImg(stage, "img/img200706080802251506.jpg");
 	var license = addLicense(stage, "AD1111");
 	
 	stage.update();
-	
+
+	// 裁剪框范围
+	var cutPoints = null;
+
+	// 添加裁剪框
+	$("#cut-start").click(function(){
+		if(img.sourceRect === null && cutPoints === null){
+			cutPoints = addCutFrame(stage, 100, 100);
+		}
+	});
+
+	// 取消裁剪框
+	$("#cut-cancel").click(function(){
+		if (cutPoints != null) {
+			stage.removeChild(cutPoints[0].parent);
+			cutPoints = null;
+			stage.update();
+		}
+	});
+
+	// 确认裁剪
+	$("#cut-confirm").click(function(){
+		if (img.sourceRect === null && cutPoints != null) {
+			stage.removeChild(cutPoints[0].parent);
+			cutImg(img, cutPoints[0].x, cutPoints[6].y, cutPoints[4].x - cutPoints[0].x, cutPoints[2].y - cutPoints[6].y);
+			cutPoints = null;
+		}
+	});
+
+	// 撤销裁剪
+	$("#cut-repeal").click(function(){
+		if (img.sourceRect != null) {
+			repealCut(stage, img);
+		}
+	});
+
+	//图片输出
 	$("#output").click(function(){
 		$(".op img").attr("src", stage.toDataURL("#DDDDDD"));
         $(".op p").append(stage.toDataURL("#DDDDDD"));
 	})
+
+	// 设置缩放监听
+	$("#minify").click(function(){
+		scale(license, -0.2);
+		stage.update();
+	});
+	$("#magnify").click(function(){
+		scale(license, 0.2);
+		stage.update();
+	});
+	// 设置旋转监听
+	$("#cwr").click(function(){
+		rotate(license, 5);
+		stage.update();
+	});
+	$("#ccwr").click(function(){
+		rotate(license, -5);
+		stage.update();
+	});
+	// 设置倾斜监听
+	$("#skewL").click(function(){
+		skew(license, -5);
+		stage.update();
+	});
+	$("#skewR").click(function(){
+		skew(license, 5);
+		stage.update();
+	});
 }
 
+/**
+ * 在画布中添加一个车牌照
+ * @param stage 画布容器
+ * @param idNum 牌照内的内容文本即车牌号
+ * @param lw 牌照初始宽度
+ * @param lh 牌照初始高度
+ * @returns {Container}license组件对象，将处理好的牌照组件对象返回
+ */
 function addLicense(stage, idNum, lw, lh){
 	// 设置默认值
 	lw = lw || 100;
@@ -47,34 +123,8 @@ function addLicense(stage, idNum, lw, lh){
 	// 设置拖动
 	license.on("pressmove", function(e){drag(e);});
     license.cursor = "move";
-	// 设置缩放监听
-	$("#minify").click(function(){
-		scale(license, -0.2);
-		stage.update();
-	});
-	$("#magnify").click(function(){
-		scale(license, 0.2);
-		stage.update();
-	});
-	// 设置旋转监听
-	$("#cwr").click(function(){
-		rotate(license, 5);
-		stage.update();
-	});
-	$("#ccwr").click(function(){
-		rotate(license, -5);
-		stage.update();
-	});
-	// 设置倾斜监听
-	$("#skewL").click(function(){
-		skew(license, -5);
-		stage.update();
-	});
-	$("#skewR").click(function(){
-		skew(license, 5);
-		stage.update();
-	});
 
+	//牌照组件的名字为"license"
     license.name = "license";
 	stage.addChild(license);
     stage.update();
@@ -82,54 +132,32 @@ function addLicense(stage, idNum, lw, lh){
 	return license;
 }
 
+/**
+ * 在画布中添加车辆图片
+ * @param stage 画布容器
+ * @param uri 车辆图片uri,支持base64码
+ * @returns {Bitmap}处理好的车辆图片对象
+ */
 function addCarImg(stage, uri){
 	// 加载图片
 	var img = new createjs.Bitmap(uri);
 	var bound = img.getBounds();
-	//img.x = img.regX = bound.width / 2;
-	//img.y = img.regY = bound.height / 2;
-	// 可拖动
-	//img.on("pressmove", function(e){drag(e);});
-	
-	// 裁剪框范围
-	var cutPoints = null;
-	
-	// 添加裁剪框
-	$("#cut-start").click(function(){
-		if(img.sourceRect === null && cutPoints === null){
-            cutPoints = addCutFrame(stage, 100, 100);
-        }
-	});
-	
-	// 取消裁剪框
-	$("#cut-cancel").click(function(){
-        if (cutPoints != null) {
-            stage.removeChild(cutPoints[0].parent);
-            cutPoints = null;
-            stage.update();
-        }
-	});
-	
-	// 确认裁剪
-	$("#cut-confirm").click(function(){
-		if (img.sourceRect === null && cutPoints != null) {
-            stage.removeChild(cutPoints[0].parent);
-			cutImg(img, cutPoints[0].x, cutPoints[6].y, cutPoints[4].x - cutPoints[0].x, cutPoints[2].y - cutPoints[6].y);
-            cutPoints = null;
-		}
-	});
-	
-	// 撤销裁剪
-	$("#cut-repeal").click(function(){
-		if (img.sourceRect != null) {
-			repealCut(stage, img);
-		}
-	});
+
+	//车辆图片组件的名字为"carImg"
 	img.name = "carImg";
 	stage.addChild(img);
     stage.update();
+
+	return img;
 }
 
+/**
+ * 添加用于裁剪车辆图片的裁剪框
+ * @param stage 画布容器
+ * @param width 初始裁剪框宽度
+ * @param height 初始裁剪框高度
+ * @returns {Array}返回裁剪框的控制点，以确定裁剪范围
+ */
 function addCutFrame(stage, width, height){
     // 取画布的宽高
     var canvas = $("#" + canvasID);

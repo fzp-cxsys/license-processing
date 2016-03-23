@@ -95,10 +95,10 @@ function frameDrag(frame){
         rect.y = evt.stageY + frame.offset.y;
         //移动控制点
         var fc = frame.children;
-        for(var c in fc){
-            if(c.name != "rect"){
-                c.x += rect.x - oldX;
-                c.y += rect.y - oldY;
+        for(var i in fc){
+            if(fc[i].name != "rect"){
+                fc[i].x += rect.x - oldX;
+                fc[i].y += rect.y - oldY;
             }
         }
         frame.stage.update();
@@ -184,32 +184,12 @@ function skew(shap, skew){
  * @param height 裁剪框高度
  */
 function cutImg(img, x, y, width, height){
-    //// 获取图片边界，用于确定裁剪之后的图片位置
-    //var bound = img.getBounds();
-    //
-    ///**
-    // * 下面需要修正相对于stage的裁剪框和相对于image的裁剪框的位置偏差
-    // * 因为传入参数为相对于stage的位置，操作中要使用相对于image的位置
-    // */
-    //var bx = x - (img.x - bound.width / 2);
-    //if(bx < 0){
-    //    width += bx;
-    //    bx = 0;
-    //}
-    //var by = y - (img.y - bound.height / 2);
-    //if(by < 0){
-    //    height += by;
-    //    by = 0;
-    //}
     // 创建裁剪范围
     var cutBound = new createjs.Rectangle(x, y, width, height);
     // 设置裁剪
     img.sourceRect = cutBound;
-    // 重设位置和注册点
-    //img.regX = cutBound.width / 2;
-    //img.regY = cutBound.height / 2;
     img.x = x;
-    img.y = x;
+    img.y = y;
     img.stage.update();
 }
 
@@ -219,15 +199,9 @@ function cutImg(img, x, y, width, height){
  * @param img
  */
 function repealCut(stage, img){
-    // 裁剪范围
-    var cutBound = img.sourceRect;
     // 撤销裁剪
     img.sourceRect = null;
-    // 重设注册点，位置
-    var bound = img.getBounds();
-    img.x += bound.width / 2 - cutBound.width / 2 - cutBound.x;
-    img.y += bound.height / 2 - cutBound.height / 2 - cutBound.y;
-    img.regX = bound.width / 2;
-    img.regY = bound.height / 2;
+    img.x = 0;
+    img.y = 0;
     stage.update();
 }
